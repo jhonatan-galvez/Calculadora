@@ -22,13 +22,13 @@ def index():
         if notas:
             promedio = sum(notas)/len(notas)
             if promedio >= 3.5:
-                resultado = "Nota final:\n AD"
+                resultado = "Nota Final:\n AD"
             if promedio >= 2.5 and promedio <= 3.49:
-                resultado = "A"
+                resultado = "Nota Final:\n A"
             if promedio >= 1.5 and promedio <= 2.49:
-                resultado = "B"
+                resultado = "Nota Final:\n B"
             if promedio <= 1.49:
-                resultado = "C"
+                resultado = "Nota Final:\n C"
     # Renderizamos la página HTML y enviamos la variable resultado
     return render_template("index.html", resultado=resultado, notas=notas_seleccionadas)
 
