@@ -16,19 +16,21 @@ def index():
         # Obtenemos la lista de notas enviadas desde el formulario
         # getlist() sirve para recoger varias notas con el mismo nombre "nota"
         notas = [letra_num[n.upper()] for n in request.form.getlist("nota") if n.strip() != ""]
+        notas_backend = request.form.getlist("nota")
+        notas_seleccionadas = notas_backend
         # ================ 
         # Calcular la nota
         # ================
         if notas:
             promedio = sum(notas)/len(notas)
             if promedio >= 3.5:
-                resultado = "Nota Final:\n AD"
+                resultado = "Nota Final:<br> AD"
             if promedio >= 2.5 and promedio <= 3.49:
-                resultado = "Nota Final:\n A"
+                resultado = "Nota Final:<br> A"
             if promedio >= 1.5 and promedio <= 2.49:
-                resultado = "Nota Final:\n B"
+                resultado = "Nota Final:<br> B"
             if promedio <= 1.49:
-                resultado = "Nota Final:\n C"
+                resultado = "Nota Final:<br> C"
     # Renderizamos la página HTML y enviamos la variable resultado
     return render_template("index.html", resultado=resultado, notas=notas_seleccionadas)
 

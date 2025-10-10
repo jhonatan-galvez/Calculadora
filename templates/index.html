@@ -13,7 +13,7 @@
 
         h1 {
             color: #ffffff;
-            font-size: 65px;
+            font-size: 60px;
             font-weight: bold;
         }
 
@@ -27,7 +27,7 @@
         /* Contenedor de botones */
         .botones {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+        grid-template-columns: 2fr 2fr 1fr;; /* 2 columnas */
         gap: 15px; /* espacio entre botones */
         justify-content: center;
         margin-bottom: 20px; /* espacio antes de los botones inferiores */
@@ -57,6 +57,7 @@
         .C  { background-color: #f68abf; color: black; }   /* Rojo */
         .limpiar { background-color: #2f2e2e; color: white; } /* Gris */
         .calcular {background-color: #e2e2e3; color: rgb(0, 0, 0); }
+        .borrar {background-color: #000000; color: #ffffff}
 
         #notas-seleccionadas {
             margin-top: 15px;
@@ -73,6 +74,7 @@
     <div class="botones">
         <button type="button" class="AD" onclick="agregarNota('AD')">AD</button>
         <button type="button" class="A" onclick="agregarNota('A')">A</button>
+        <button type="button" class="borrar" onclick="borrarNota()">⬅</button>
         <button type="button" class="B" onclick="agregarNota('B')">B</button>
         <button type="button" class="C" onclick="agregarNota('C')">C</button>
     </div>
@@ -99,7 +101,7 @@
 
     <!-- Mostrar resultado -->
 
-<h2>{{ resultado }}</h2>
+<h2>{{ resultado|safe }}</h2>
 
     <script>
         function agregarNota(nota) {
@@ -110,8 +112,11 @@
             input.value = nota;
             document.getElementById("inputs-notas").appendChild(input);
 
-            const divNotas = document.getElementById("notas-seleccionadas");
-            divNotas.textContent += nota + " ";
+            
+            const inputs = document.querySelectorAll("#inputs-notas input");
+            const notas = Array.from(inputs).map(i => i.value);
+            document.getElementById("notas-seleccionadas").textContent =
+                "Notas seleccionadas: " + notas.join(" ");
         }
 
         function limpiarNotas() {
@@ -119,6 +124,17 @@
             document.getElementById("notas-seleccionadas").textContent = "Notas seleccionadas: ";
             document.querySelector("h2").textContent = "";
         }
+        function borrarNota() {
+            const inputs = document.querySelectorAll("#inputs-notas input");
+            if (inputs.length > 0) {
+                inputs[inputs.length - 1].remove();
+            }
+
+            const restantes = Array.from(document.querySelectorAll("#inputs-notas input")).map(i => i.value);
+            document.getElementById("notas-seleccionadas").textContent =
+                "Notas seleccionadas: " + restantes.join(" ");
+        }
+
     </script>
 </body>
 </html>
