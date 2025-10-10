@@ -22,7 +22,7 @@ def index():
         if notas:
             promedio = sum(notas)/len(notas)
             if promedio >= 3.5:
-                resultado = "AD"
+                resultado = "Nota final:\n AD"
             if promedio >= 2.5 and promedio <= 3.49:
                 resultado = "A"
             if promedio >= 1.5 and promedio <= 2.49:
