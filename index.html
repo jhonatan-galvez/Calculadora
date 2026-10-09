@@ -178,7 +178,7 @@
         // Dibuja la lista de notas en pantalla y limpia el resultado anterior
         function actualizarPantalla() {
             document.getElementById("notas-seleccionadas").textContent =
-                "Notas seleccionadas: " + notas.join(" ");
+                "Notas seleccionadas: " + notas.join(" + ");
             document.getElementById("resultado").textContent = "";
         }
 
@@ -257,7 +257,7 @@
                 const li = document.createElement("li");
 
                 const texto = document.createElement("span");
-                texto.textContent = registro.notas.join(" ");
+                texto.textContent = registro.notas.join(" + ");
 
                 const letra = document.createElement("span");
                 letra.className = "letra";
