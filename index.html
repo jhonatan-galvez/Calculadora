@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no">
+    <title>Calculadora de Notas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center; /* Centra todo horizontalmente */
+            background-color: #717171;
+            padding: 10px 20px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 60px;
+            color: #ffffff;
+            font-weight: bold;
+            margin-top: 40px;
+            min-height: 140px; /* reserva el espacio para que la pantalla no salte al calcular */
+        }
+
+        /* Contenedor de botones: 3 columnas */
+        .botones {
+            display: grid;
+            grid-template-columns: 2fr 2fr 0.75fr;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
+        /* Contenedor inferior (Calcular) */
+        .botones-inferiores {
+            display: flex;
+            margin-top: 50px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 60px 25px;
+            font-size: 65px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        /* Efecto al presionar */
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .calcular {
+            background-color: #e2e2e3;
+            color: rgb(0, 0, 0);
+            padding: 50px 80px;
+        }
+
+        /* Botones de nota (AD, A, B, C): mismo color */
+        .nota { background-color: #f68abf; color: black; }
+        .limpiar { background-color: #414040; color: white; }
+        .borrar { background-color: #000000; color: #ffffff; }
+
+        #notas-seleccionadas {
+            margin-top: 50px;
+            font-weight: bold;
+            font-size: 50px;
+            color: #ffffff;
+        }
+
+        /* Historial */
+        #historial {
+            margin-top: 60px;
+            color: #ffffff;
+        }
+
+        #historial h3 {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        #lista-historial {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #lista-historial li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background-color: #5f5f5f;
+            border-radius: 15px;
+            padding: 25px 35px;
+            margin-bottom: 20px;
+            font-size: 45px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        #lista-historial .letra {
+            background-color: #f68abf;
+            color: black;
+            border-radius: 12px;
+            padding: 5px 30px;
+        }
+
+        #historial-vacio {
+            font-size: 40px;
+        }
+
+        .borrar-historial {
+            background-color: #414040;
+            color: white;
+            padding: 30px 50px;
+            font-size: 40px;
+            margin: 20px 0 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora 👸👑</h1>
+
+    <!-- Botones para agregar notas -->
+    <div class="botones">
+        <button type="button" class="nota" onclick="agregarNota('AD')">AD</button>
+        <button type="button" class="nota" onclick="agregarNota('A')">A</button>
+        <button type="button" class="borrar" onclick="borrarNota()" aria-label="Borrar última nota">⌫</button>
+        <button type="button" class="nota" onclick="agregarNota('B')">B</button>
+        <button type="button" class="nota" onclick="agregarNota('C')">C</button>
+        <button type="button" class="limpiar" onclick="limpiarNotas()">CLR</button>
+    </div>
+
+    <!-- Fila inferior: Calcular -->
+    <div class="botones-inferiores">
+        <button type="button" class="calcular" onclick="calcular()">Calcular</button>
+    </div>
+
+    <!-- Notas seleccionadas -->
+    <div id="notas-seleccionadas">Notas seleccionadas:</div>
+
+    <!-- Resultado -->
+    <h2 id="resultado"></h2>
+
+    <!-- Historial de cálculos -->
+    <div id="historial">
+        <h3>Historial</h3>
+        <p id="historial-vacio">Aún no hay cálculos</p>
+        <ul id="lista-historial"></ul>
+        <button type="button" class="borrar-historial" id="btn-borrar-historial" onclick="borrarHistorial()">Borrar historial</button>
+    </div>
+
+    <script>
+        // Escala: letra -> valor numérico
+        const LETRA_NUM = { AD: 4, A: 3, B: 2, C: 1 };
+
+        // Lista de notas elegidas (reemplaza al formulario y a los inputs ocultos)
+        let notas = [];
+
+        // Convierte el promedio en letra. Cada rango empieza donde termina el anterior (sin huecos).
+        function promedioALetra(promedio) {
+            if (promedio >= 3.5) return "AD";
+            if (promedio >= 2.5) return "A";
+            if (promedio >= 1.5) return "B";
+            return "C";
+        }
+
+        // Dibuja la lista de notas en pantalla y limpia el resultado anterior
+        function actualizarPantalla() {
+            document.getElementById("notas-seleccionadas").textContent =
+                "Notas seleccionadas: " + notas.join(" ");
+            document.getElementById("resultado").textContent = "";
+        }
+
+        function agregarNota(nota) {
+            notas.push(nota);
+            actualizarPantalla();
+        }
+
+        function borrarNota() {
+            notas.pop(); // si la lista está vacía, no hace nada
+            actualizarPantalla();
+        }
+
+        function limpiarNotas() {
+            notas = [];
+            actualizarPantalla();
+        }
+
+        function calcular() {
+            if (notas.length === 0) return;
+
+            const suma = notas.reduce((total, n) => total + LETRA_NUM[n], 0);
+            const letra = promedioALetra(suma / notas.length);
+
+            // textContent + <br> creado con el DOM: no se inyecta HTML
+            const h2 = document.getElementById("resultado");
+            h2.textContent = "";
+            h2.append("Nota Final:", document.createElement("br"), letra);
+
+            guardarEnHistorial(notas, letra);
+        }
+
+        // ================= Historial =================
+        const CLAVE_HISTORIAL = "historial_calculadora";
+        const MAX_HISTORIAL = 20;
+
+        // Lee el historial guardado. Si no hay nada o el almacenamiento falla, devuelve lista vacía.
+        function leerHistorial() {
+            try {
+                const datos = JSON.parse(localStorage.getItem(CLAVE_HISTORIAL));
+                return Array.isArray(datos) ? datos : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function escribirHistorial(lista) {
+            try {
+                localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(lista));
+            } catch (e) {
+                // Si el navegador bloquea el almacenamiento, la calculadora sigue funcionando
+            }
+        }
+
+        function guardarEnHistorial(notasCalculadas, letra) {
+            const historial = leerHistorial();
+            const registro = { notas: [...notasCalculadas], letra: letra };
+
+            // Evita duplicar si se pulsa Calcular dos veces seguidas con lo mismo
+            const ultimo = historial[0];
+            const esIgual = ultimo && ultimo.letra === registro.letra &&
+                            ultimo.notas.join(" ") === registro.notas.join(" ");
+            if (!esIgual) {
+                historial.unshift(registro); // el más reciente arriba
+                escribirHistorial(historial.slice(0, MAX_HISTORIAL));
+            }
+            mostrarHistorial();
+        }
+
+        function mostrarHistorial() {
+            const historial = leerHistorial();
+            const lista = document.getElementById("lista-historial");
+            lista.innerHTML = "";
+
+            historial.forEach(registro => {
+                const li = document.createElement("li");
+
+                const texto = document.createElement("span");
+                texto.textContent = registro.notas.join(" ");
+
+                const letra = document.createElement("span");
+                letra.className = "letra";
+                letra.textContent = registro.letra;
+
+                li.append(texto, letra);
+                lista.appendChild(li);
+            });
+
+            const hayDatos = historial.length > 0;
+            document.getElementById("historial-vacio").style.display = hayDatos ? "none" : "block";
+            document.getElementById("btn-borrar-historial").style.display = hayDatos ? "inline-block" : "none";
+        }
+
+        function borrarHistorial() {
+            try {
+                localStorage.removeItem(CLAVE_HISTORIAL);
+            } catch (e) {}
+            mostrarHistorial();
+        }
+
+        // Muestra el historial guardado al abrir la página
+        mostrarHistorial();
+    </script>
+</body>
+</html>
